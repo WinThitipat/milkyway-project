@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Solar System Explorer</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      background:#000; color:white; font-family:'Arial',sans-serif;
+      overflow:hidden; position:relative;
+    }
+    .container { width:100vw; height:100vh; position:relative; }
+
+        /* Stars */
+    .stars {
+      position:absolute; width:100%; height:100%;
+      background: radial-gradient(2px 2px at 20px 30px,#eee,transparent),
+                  radial-gradient(2px 2px at 40px 70px,rgba(255,255,255,0.8),transparent),
+                  radial-gradient(1px 1px at 90px 40px,#fff,transparent),
+                  radial-gradient(1px 1px at 130px 80px,rgba(255,255,255,0.6),transparent),
+                  radial-gradient(2px 2px at 160px 30px,#ddd,transparent);
+      background-repeat:repeat; background-size:200px 150px;
+      animation:twinkle 20s linear infinite;
+      opacity:0; transition:opacity 2s ease-in-out;
+    }
+    @keyframes twinkle { 0%,100%{opacity:0.3;} 50%{opacity:1;} }
+
+    /* Meteors */
+    .meteor {
+      position:absolute;
+      width:3px; height:100px;
+      background:linear-gradient(to bottom,white,transparent);
+      opacity:0.8; transform:rotate(45deg);
+      pointer-events:none;
+      animation:fall 2s linear forwards;
+      box-shadow:0 0 10px white;
+    }
+    @keyframes fall {
+      from { transform:translate(0,0) rotate(45deg); opacity:1; }
+      to { transform:translate(400px,400px) rotate(45deg); opacity:0; }
+    }
+    /* Start Button */
+    .start-button {
+      position:absolute; top:50%; left:50%;
+      transform:translate(-50%,-50%);
+      width:120px; height:120px; border-radius:50%;
+      background:radial-gradient(circle,#ff4444,#cc0000);
+      border:4px solid #fff; cursor:pointer;
+      box-shadow:0 0 30px rgba(255,68,68,0.6); z-index:1000;
+    }
+    .start-button:hover {
+      transform:translate(-50%,-50%) scale(1.1);
+      box-shadow:0 0 50px rgba(255,68,68,0.8);
+    }
+    .start-button::before {
+      content:"START"; position:absolute; top:50%; left:50%;
+      transform:translate(-50%,-50%);
+      font-weight:bold; font-size:16px; color:white;
+    }
+
+    /* Intro text */
+    .intro-text {
+      position:absolute; top:50%; left:50%;
+      transform:translate(-50%,-50%);
+      text-align:center; font-size:3em; color:#ffeb3b;
+      opacity:0; display:none;
+    }
+    .intro-text.big-bang-text {
+      animation:introAnim 4s ease-in-out;
+    }
+    @keyframes introAnim {
+      0%{opacity:0; transform:translate(-50%,-50%) scale(0.5);}
+      50%{opacity:1; transform:translate(-50%,-50%) scale(1.2);}
+      100%{opacity:0; transform:translate(-50%,-50%) scale(1);}
+    }
+
+    /* Effects */
+    .black-hole,.big-bang {
+      display:none; position:absolute; top:50%; left:50%;
+      transform:translate(-50%,-50%);
+      border-radius:50%;
+    }
+    .black-hole { width:80px; height:80px; background:black;
+      box-shadow:0 0 60px #000; }
+    .big-bang { width:200px; height:200px; background:radial-gradient(circle,#fff,#ff9800,transparent);
+      box-shadow:0 0 100px #ffeb3b; }
+
+    .energy-particle {
+      position:absolute; width:5px; height:5px;
+      border-radius:50%; pointer-events:none;
+    }
+
+    body.lit { background:radial-gradient(circle at center,#001133,#000); }
+    body.lit .stars { opacity:0.8; }
+
+    /* Main content */
+    .content { width:100%; height:100%; display:none; position:relative; }
+    .content.active { display:block; }
+
+    .nav-buttons {
+      position:absolute; top:20px; left:20px; z-index:100;
+      display:flex; flex-direction:column; gap:10px;
+    }
+    .nav-btn {
+      padding:12px 20px; background:rgba(0,100,200,0.8); color:white;
+      border:none; border-radius:25px; cursor:pointer;
+      font-weight:bold; backdrop-filter:blur(10px);
+      transition:all .3s ease;
+    }
+    .nav-btn:hover { background:rgba(0,150,255,0.9); transform:translateX(5px); }
+
+    /* Solar System */
+    .solar-system { width:100%; height:100%; position:relative;
+      display:flex; align-items:center; justify-content:center; }
+    .orbit {
+      position:absolute; border:1px solid rgba(255,255,255,0.1);
+      border-radius:50%; animation:spin linear infinite;
+    }
+    @keyframes spin { from{transform:rotate(0deg);} to{transform:rotate(360deg);} }
+    .sun {
+      width:60px; height:60px; background:radial-gradient(circle,#ffeb3b,#ff9800);
+      border-radius:50%; position:absolute; top:50%; left:50%;
+      transform:translate(-50%,-50%); box-shadow:0 0 40px #ffeb3b; z-index:10; cursor:pointer;
+    }
+    .planet {
+      width:20px; height:20px; border-radius:50%; position:absolute; top:-10px;
+      cursor:pointer; transition:all .3s ease;
+    }
+    .planet:hover { transform:scale(1.5); box-shadow:0 0 20px currentColor; }
+
+    /* Orbits */
+    .mercury-orbit{width:150px;height:150px;animation-duration:8s;}
+    .venus-orbit{width:200px;height:200px;animation-duration:12s;}
+    .earth-orbit{width:250px;height:250px;animation-duration:16s;}
+    .mars-orbit{width:300px;height:300px;animation-duration:20s;}
+    .jupiter-orbit{width:400px;height:400px;animation-duration:30s;}
+    .saturn-orbit{width:480px;height:480px;animation-duration:40s;}
+    .uranus-orbit{width:560px;height:560px;animation-duration:50s;}
+    .neptune-orbit{width:620px;height:620px;animation-duration:60s;}
+
+    .mercury{background:#8c7853; left:75px;}
+    .venus{background:#ffc649; left:100px;}
+    .earth{background:#6b93d6; left:125px;}
+    .mars{background:#c1440e; left:150px;}
+    .jupiter{background:#d8ca9d;width:35px;height:35px;top:-17px;left:200px;}
+    .saturn{background:#fad5a5;width:30px;height:30px;top:-15px;left:240px;}
+    .uranus{background:#4fd0e7;width:25px;height:25px;top:-12px;left:280px;}
+    .neptune{background:#4b70dd;width:25px;height:25px;top:-12px;left:310px;}
+
+    /* Planet detail */
+    .planet-detail {
+      position:absolute; top:50%; left:50%;
+      transform:translate(-50%,-50%);
+      background:rgba(0,0,0,0.9); padding:40px; border-radius:20px;
+      text-align:center; max-width:500px; backdrop-filter:blur(15px);
+      border:2px solid rgba(255,255,255,0.2);
+      display:none;
+    }
+    .planet-detail.active { display:block; animation:fadeIn .5s ease-in-out; }
+    @keyframes fadeIn { from{opacity:0;transform:translate(-50%,-50%) scale(0.8);}
+                        to{opacity:1;transform:translate(-50%,-50%) scale(1);} }
+    .planet-detail h2 { color:#ffeb3b; margin-bottom:20px; font-size:2.5em; }
+    .planet-detail .planet-image {
+      width:150px; height:150px; border-radius:50%; margin:20px auto;
+      box-shadow:0 0 30px currentColor;
+    }
+    .planet-detail p { line-height:1.6; margin-bottom:15px; font-size:1.1em; }
+    .close-btn { position:absolute; top:15px; right:20px; background:none;
+      border:none; color:white; font-size:24px; cursor:pointer; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="stars"></div>
+    <div class="start-button" id="startBtn"></div>
+    <div class="intro-text" id="introText">Welcome to the Solar System</div>
+    <div class="black-hole" id="blackHole"></div>
+    <div class="big-bang" id="bigBang"></div>
+
+    <div class="content" id="mainContent">
+      <div class="nav-buttons">
+        <button class="nav-btn" id="solarSystemBtn">Solar System</button>
+        <button class="nav-btn" id="mercuryBtn">Mercury</button>
+        <button class="nav-btn" id="venusBtn">Venus</button>
+        <button class="nav-btn" id="earthBtn">Earth</button>
+        <button class="nav-btn" id="marsBtn">Mars</button>
+        <button class="nav-btn" id="jupiterBtn">Jupiter</button>
+        <button class="nav-btn" id="saturnBtn">Saturn</button>
+        <button class="nav-btn" id="uranusBtn">Uranus</button>
+        <button class="nav-btn" id="neptuneBtn">Neptune</button>
+      </div>
+
+      <div class="solar-system" id="solarSystemView">
+        <div class="sun" data-planet="sun"></div>
+        <div class="orbit mercury-orbit"><div class="planet mercury" data-planet="mercury"></div></div>
+        <div class="orbit venus-orbit"><div class="planet venus" data-planet="venus"></div></div>
+        <div class="orbit earth-orbit"><div class="planet earth" data-planet="earth"></div></div>
+        <div class="orbit mars-orbit"><div class="planet mars" data-planet="mars"></div></div>
+        <div class="orbit jupiter-orbit"><div class="planet jupiter" data-planet="jupiter"></div></div>
+        <div class="orbit saturn-orbit"><div class="planet saturn" data-planet="saturn"></div></div>
+        <div class="orbit uranus-orbit"><div class="planet uranus" data-planet="uranus"></div></div>
+        <div class="orbit neptune-orbit"><div class="planet neptune" data-planet="neptune"></div></div>
+      </div>
+
+      <div class="planet-detail" id="planetDetail">
+        <button class="close-btn" id="closeBtn">×</button>
+        <h2 id="planetName">Planet Name</h2>
+        <div class="planet-image" id="planetImage"></div>
+        <div id="planetInfo"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const planetData = {
+      sun:{
+        name:"The Sun",
+        color:"#ffeb3b",
+        info:`
+          <p><strong>Type:</strong> G-type Main Sequence Star (Yellow Dwarf)</p>
+          <p><strong>Diameter:</strong> 1.39 million km</p>
+          <p><strong>Surface Temperature:</strong> ~5,500°C</p>
+          <p>The Sun is the heart of our Solar System, containing 99.8% of its mass.
+          Its energy comes from nuclear fusion of hydrogen into helium. 
+          Without the Sun, life on Earth would not exist.</p>
+        `
+      },
+      mercury:{ name:"Mercury", color:"#8c7853", info:`<p><strong>Distance:</strong> 57.9m km</p><p><strong>Year:</strong> 88 days</p><p><strong>Day:</strong> 59 days</p><p>Smallest planet, extreme temperatures, and water ice in shadowed craters.</p>` },
+      venus:{ name:"Venus", color:"#ffc649", info:`<p><strong>Distance:</strong> 108m km</p><p><strong>Year:</strong> 225 days</p><p><strong>Day:</strong> 243 days</p><p>Similar size to Earth but hottest planet with thick CO₂ atmosphere.</p>` },
+      earth:{ name:"Earth", color:"#6b93d6", info:`<p><strong>Distance:</strong> 149.6m km</p><p><strong>Year:</strong> 365 days</p><p><strong>Day:</strong> 24 hrs</p><p>Only known planet with life, water oceans, and protective atmosphere.</p>` },
+      mars:{ name:"Mars", color:"#c1440e", info:`<p><strong>Distance:</strong> 227.9m km</p><p><strong>Year:</strong> 687 days</p><p><strong>Day:</strong> 24.6 hrs</p><p>Red Planet with largest volcano Olympus Mons and past liquid water.</p>` },
+      jupiter:{ name:"Jupiter", color:"#d8ca9d", info:`<p><strong>Distance:</strong> 778.5m km</p><p><strong>Year:</strong> 12 years</p><p><strong>Day:</strong> 10 hrs</p><p>Largest planet, gas giant with Great Red Spot storm and 95 moons.</p>` },
+      saturn:{ name:"Saturn", color:"#fad5a5", info:`<p><strong>Distance:</strong> 1.43b km</p><p><strong>Year:</strong> 29 years</p><p><strong>Day:</strong> 10.7 hrs</p><p>Famous for rings, least dense planet, with moon Titan.</p>` },
+      uranus:{ name:"Uranus", color:"#4fd0e7", info:`<p><strong>Distance:</strong> 2.87b km</p><p><strong>Year:</strong> 84 years</p><p><strong>Day:</strong> 17 hrs</p><p>Ice giant tilted on its side with 27 moons and faint rings.</p>` },
+      neptune:{ name:"Neptune", color:"#4b70dd", info:`<p><strong>Distance:</strong> 4.5b km</p><p><strong>Year:</strong> 165 years</p><p><strong>Day:</strong> 16 hrs</p><p>Deep blue, windiest planet with supersonic storms and moon Triton.</p>` }
+    };
+
+    let currentView='solar-system';
+    document.getElementById('startBtn').addEventListener('click',startExperience);
+    document.getElementById('solarSystemBtn').addEventListener('click',()=>showSolarSystem());
+    document.getElementById('closeBtn').addEventListener('click',closePlanetDetail);
+
+    Object.keys(planetData).forEach(p=>{
+      const btn=document.getElementById(`${p}Btn`);
+      if(btn) btn.addEventListener('click',()=>showPlanet(p));
+    });
+    document.querySelectorAll('.planet,.sun').forEach(el=>{
+      el.addEventListener('click',e=>{
+        showPlanet(e.target.getAttribute('data-planet'));
+      });
+    });
+
+    function startExperience(){
+      const startBtn=document.getElementById('startBtn');
+      const stars=document.querySelector('.stars');
+      const blackHole=document.getElementById('blackHole');
+      const bigBang=document.getElementById('bigBang');
+      const introText=document.getElementById('introText');
+      startBtn.style.display='none';
+
+      createEnergyParticles();
+      setTimeout(()=>{ blackHole.style.display='block'; },2000);
+      setTimeout(()=>{
+        blackHole.style.display='none';
+        bigBang.style.display='block';
+        document.body.style.backgroundColor='#fff';
+        setTimeout(()=>{ document.body.style.backgroundColor=''; },200);
+      },4000);
+      setTimeout(()=>{
+        bigBang.style.display='none';
+        introText.style.display='block';
+        introText.classList.add('big-bang-text');
+      },5000);
+      setTimeout(()=>{
+        document.body.classList.add('lit');
+        stars.style.opacity='0.8';
+        document.getElementById('mainContent').classList.add('active');
+        showSolarSystem();
+      },9000);
+    }
+    function createEnergyParticles(){
+      const container=document.querySelector('.container');
+      for(let i=0;i<50;i++){
+        const p=document.createElement('div');
+        p.className='energy-particle';
+        const x=Math.random()*window.innerWidth;
+        const y=Math.random()*window.innerHeight;
+        const cx=window.innerWidth/2, cy=window.innerHeight/2;
+        p.style.left=x+'px'; p.style.top=y+'px';
+        p.style.background=['#fff','#ffeb3b','#ff9800','#f44336','#9c27b0','#3f51b5'][Math.floor(Math.random()*6)];
+        container.appendChild(p);
+        setTimeout(()=>{
+          p.style.transition='all 3s ease-in';
+          p.style.left=cx+'px'; p.style.top=cy+'px';
+        },i*10);
+        setTimeout(()=>p.remove(),6000);
+      }
+    }
+    function showSolarSystem(){
+      currentView='solar-system';
+      document.getElementById('solarSystemView').style.display='flex';
+      document.getElementById('planetDetail').classList.remove('active');
+    }
+    function showPlanet(key){
+      currentView=key;
+      const d=planetData[key];
+      document.getElementById('solarSystemView').style.display='none';
+      const detail=document.getElementById('planetDetail');
+      document.getElementById('planetName').innerText=d.name;
+      document.getElementById('planetImage').style.background=d.color;
+      document.getElementById('planetInfo').innerHTML=d.info;
+      detail.classList.add('active');
+    }
+    function closePlanetDetail(){
+      if(currentView!=='solar-system'){ showSolarSystem(); }
+    }
+  </script>
+</body>
+</html>
