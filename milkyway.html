@@ -12,7 +12,7 @@
     }
     .container { width:100vw; height:100vh; position:relative; }
 
-        /* Stars */
+    /* ⭐ ส่วนแสดงดาวพื้นหลัง (Stars) */
     .stars {
       position:absolute; width:100%; height:100%;
       background: radial-gradient(2px 2px at 20px 30px,#eee,transparent),
@@ -21,12 +21,12 @@
                   radial-gradient(1px 1px at 130px 80px,rgba(255,255,255,0.6),transparent),
                   radial-gradient(2px 2px at 160px 30px,#ddd,transparent);
       background-repeat:repeat; background-size:200px 150px;
-      animation:twinkle 20s linear infinite;
+      animation:twinkle 20s linear infinite; /* ทำให้ดาวระยิบระยับ */
       opacity:0; transition:opacity 2s ease-in-out;
     }
     @keyframes twinkle { 0%,100%{opacity:0.3;} 50%{opacity:1;} }
 
-    /* Meteors */
+    /* 🌠 เอฟเฟกต์อุกกาบาต (Meteor) */
     .meteor {
       position:absolute;
       width:3px; height:100px;
@@ -37,10 +37,11 @@
       box-shadow:0 0 10px white;
     }
     @keyframes fall {
-      from { transform:translate(0,0) rotate(45deg); opacity:1; }
-      to { transform:translate(400px,400px) rotate(45deg); opacity:0; }
+      from { transform:translate(0,0) rotate(115deg); opacity:1; }
+      to { transform:translate(400px,400px) rotate(115deg); opacity:0; }
     }
-    /* Start Button */
+
+    /* 🔘 ปุ่มเริ่มต้น (Start Button) */
     .start-button {
       position:absolute; top:50%; left:50%;
       transform:translate(-50%,-50%);
@@ -59,7 +60,7 @@
       font-weight:bold; font-size:16px; color:white;
     }
 
-    /* Intro text */
+    /* 📝 ข้อความ Intro */
     .intro-text {
       position:absolute; top:50%; left:50%;
       transform:translate(-50%,-50%);
@@ -75,7 +76,7 @@
       100%{opacity:0; transform:translate(-50%,-50%) scale(1);}
     }
 
-    /* Effects */
+    /* 🌌 เอฟเฟกต์ Black hole และ Big Bang */
     .black-hole,.big-bang {
       display:none; position:absolute; top:50%; left:50%;
       transform:translate(-50%,-50%);
@@ -86,6 +87,7 @@
     .big-bang { width:200px; height:200px; background:radial-gradient(circle,#fff,#ff9800,transparent);
       box-shadow:0 0 100px #ffeb3b; }
 
+    /* 🌟 อนุภาคพลังงานที่กระจายตอน Big Bang */
     .energy-particle {
       position:absolute; width:5px; height:5px;
       border-radius:50%; pointer-events:none;
@@ -94,10 +96,11 @@
     body.lit { background:radial-gradient(circle at center,#001133,#000); }
     body.lit .stars { opacity:0.8; }
 
-    /* Main content */
+    /* 🖥 เนื้อหาหลัก */
     .content { width:100%; height:100%; display:none; position:relative; }
     .content.active { display:block; }
 
+    /* 🔘 ปุ่มนำทางเลือกดูดาว */
     .nav-buttons {
       position:absolute; top:20px; left:20px; z-index:100;
       display:flex; flex-direction:column; gap:10px;
@@ -110,7 +113,7 @@
     }
     .nav-btn:hover { background:rgba(0,150,255,0.9); transform:translateX(5px); }
 
-    /* Solar System */
+    /* 🌞 ระบบสุริยะ */
     .solar-system { width:100%; height:100%; position:relative;
       display:flex; align-items:center; justify-content:center; }
     .orbit {
@@ -129,7 +132,7 @@
     }
     .planet:hover { transform:scale(1.5); box-shadow:0 0 20px currentColor; }
 
-    /* Orbits */
+    /* 🪐 ขนาดวงโคจรและเวลาโคจร */
     .mercury-orbit{width:150px;height:150px;animation-duration:8s;}
     .venus-orbit{width:200px;height:200px;animation-duration:12s;}
     .earth-orbit{width:250px;height:250px;animation-duration:16s;}
@@ -139,6 +142,7 @@
     .uranus-orbit{width:560px;height:560px;animation-duration:50s;}
     .neptune-orbit{width:620px;height:620px;animation-duration:60s;}
 
+    /* 🎨 สีของดาวแต่ละดวง */
     .mercury{background:#8c7853; left:75px;}
     .venus{background:#ffc649; left:100px;}
     .earth{background:#6b93d6; left:125px;}
@@ -148,7 +152,7 @@
     .uranus{background:#4fd0e7;width:25px;height:25px;top:-12px;left:280px;}
     .neptune{background:#4b70dd;width:25px;height:25px;top:-12px;left:310px;}
 
-    /* Planet detail */
+    /* 📖 กล่องแสดงรายละเอียดดาว */
     .planet-detail {
       position:absolute; top:50%; left:50%;
       transform:translate(-50%,-50%);
@@ -172,13 +176,22 @@
 </head>
 <body>
   <div class="container">
+    <!-- 🌌 พื้นหลังดาว -->
     <div class="stars"></div>
+
+    <!-- 🔘 ปุ่มเริ่มต้น -->
     <div class="start-button" id="startBtn"></div>
+
+    <!-- 📝 ข้อความต้อนรับ -->
     <div class="intro-text" id="introText">Welcome to the Solar System</div>
+
+    <!-- 🌑 Black Hole และ 🌟 Big Bang -->
     <div class="black-hole" id="blackHole"></div>
     <div class="big-bang" id="bigBang"></div>
 
+    <!-- 🖥 เนื้อหาหลัก -->
     <div class="content" id="mainContent">
+      <!-- 🔘 ปุ่มเลือกดาว -->
       <div class="nav-buttons">
         <button class="nav-btn" id="solarSystemBtn">Solar System</button>
         <button class="nav-btn" id="mercuryBtn">Mercury</button>
@@ -191,6 +204,7 @@
         <button class="nav-btn" id="neptuneBtn">Neptune</button>
       </div>
 
+      <!-- 🌌 ระบบสุริยะ -->
       <div class="solar-system" id="solarSystemView">
         <div class="sun" data-planet="sun"></div>
         <div class="orbit mercury-orbit"><div class="planet mercury" data-planet="mercury"></div></div>
@@ -203,6 +217,7 @@
         <div class="orbit neptune-orbit"><div class="planet neptune" data-planet="neptune"></div></div>
       </div>
 
+      <!-- 📖 หน้าต่างรายละเอียดดาว -->
       <div class="planet-detail" id="planetDetail">
         <button class="close-btn" id="closeBtn">×</button>
         <h2 id="planetName">Planet Name</h2>
@@ -213,44 +228,147 @@
   </div>
 
   <script>
+    /* 📊 ข้อมูลดาวแต่ละดวง */
     const planetData = {
       sun:{
         name:"The Sun",
         color:"#ffeb3b",
         info:`
-          <p><strong>Type:</strong> G-type Main Sequence Star (Yellow Dwarf)</p>
-          <p><strong>Diameter:</strong> 1.39 million km</p>
-          <p><strong>Surface Temperature:</strong> ~5,500°C</p>
-          <p>The Sun is the heart of our Solar System, containing 99.8% of its mass.
-          Its energy comes from nuclear fusion of hydrogen into helium. 
-          Without the Sun, life on Earth would not exist.</p>
+            <p><strong>Type:</strong> G-type Main Sequence Star (Yellow Dwarf)</p>
+            <p><strong>Diameter:</strong> 1.39 million km</p>
+            <p><strong>Surface Temperature:</strong> ~5,500°C</p>
+            <p>The Sun is the heart of our Solar System, containing 99.8% of its mass.
+            Its energy comes from nuclear fusion of hydrogen into helium. 
+            Without the Sun, life on Earth would not exist.</p>
         `
       },
-      mercury:{ name:"Mercury", color:"#8c7853", info:`<p><strong>Distance:</strong> 57.9m km</p><p><strong>Year:</strong> 88 days</p><p><strong>Day:</strong> 59 days</p><p>Smallest planet, extreme temperatures, and water ice in shadowed craters.</p>` },
-      venus:{ name:"Venus", color:"#ffc649", info:`<p><strong>Distance:</strong> 108m km</p><p><strong>Year:</strong> 225 days</p><p><strong>Day:</strong> 243 days</p><p>Similar size to Earth but hottest planet with thick CO₂ atmosphere.</p>` },
-      earth:{ name:"Earth", color:"#6b93d6", info:`<p><strong>Distance:</strong> 149.6m km</p><p><strong>Year:</strong> 365 days</p><p><strong>Day:</strong> 24 hrs</p><p>Only known planet with life, water oceans, and protective atmosphere.</p>` },
-      mars:{ name:"Mars", color:"#c1440e", info:`<p><strong>Distance:</strong> 227.9m km</p><p><strong>Year:</strong> 687 days</p><p><strong>Day:</strong> 24.6 hrs</p><p>Red Planet with largest volcano Olympus Mons and past liquid water.</p>` },
-      jupiter:{ name:"Jupiter", color:"#d8ca9d", info:`<p><strong>Distance:</strong> 778.5m km</p><p><strong>Year:</strong> 12 years</p><p><strong>Day:</strong> 10 hrs</p><p>Largest planet, gas giant with Great Red Spot storm and 95 moons.</p>` },
-      saturn:{ name:"Saturn", color:"#fad5a5", info:`<p><strong>Distance:</strong> 1.43b km</p><p><strong>Year:</strong> 29 years</p><p><strong>Day:</strong> 10.7 hrs</p><p>Famous for rings, least dense planet, with moon Titan.</p>` },
-      uranus:{ name:"Uranus", color:"#4fd0e7", info:`<p><strong>Distance:</strong> 2.87b km</p><p><strong>Year:</strong> 84 years</p><p><strong>Day:</strong> 17 hrs</p><p>Ice giant tilted on its side with 27 moons and faint rings.</p>` },
-      neptune:{ name:"Neptune", color:"#4b70dd", info:`<p><strong>Distance:</strong> 4.5b km</p><p><strong>Year:</strong> 165 years</p><p><strong>Day:</strong> 16 hrs</p><p>Deep blue, windiest planet with supersonic storms and moon Triton.</p>` }
+      mercury:{ 
+        name:"Mercury", 
+        color:"#8c7853", 
+        info:`
+            <p><strong>Distance:</strong> 57.9m km</p>
+            <p><strong>Year:</strong> 88 days</p>
+            <p><strong>Day:</strong> 59 days</p>
+            <p>Smallest planet, extreme temperatures, and water ice in shadowed craters.</p>
+            ` },
+      venus:{ 
+        name:"Venus", 
+        color:"#ffc649", 
+        info:`
+            <p><strong>Distance:</strong> 108m km</p>
+            <p><strong>Year:</strong> 225 days</p>
+            <p><strong>Day:</strong> 243 days</p>
+            <p>Similar size to Earth but hottest planet with thick CO₂ atmosphere.</p>
+            ` },
+      earth:{ 
+        name:"Earth", 
+        color:"#6b93d6", 
+        info:`
+            <p><strong>Distance:</strong> 149.6m km</p>
+            <p><strong>Year:</strong> 365 days</p>
+            <p><strong>Day:</strong> 24 hrs</p>
+            <p>Only known planet with life, water oceans, and protective atmosphere.</p>
+      ` },
+      mars:{ 
+        name:"Mars", 
+        color:"#c1440e", 
+        info:`
+            <p><strong>Distance:</strong> 227.9m km</p>
+            <p><strong>Year:</strong> 687 days</p>
+            <p><strong>Day:</strong> 24.6 hrs</p>
+            <p>Red Planet with largest volcano Olympus Mons and past liquid water.</p>
+        ` },
+      jupiter:{ 
+        name:"Jupiter", 
+        color:"#d8ca9d", 
+        info:`
+            <p><strong>Distance:</strong> 778.5m km</p>
+            <p><strong>Year:</strong> 12 years</p>
+            <p><strong>Day:</strong> 10 hrs</p>
+            <p>Largest planet, gas giant with Great Red Spot storm and 95 moons.</p>
+        ` },
+      saturn:{ 
+        name:"Saturn", 
+        color:"#fad5a5", 
+        info:`
+            <p><strong>Distance:</strong> 1.43b km</p>
+            <p><strong>Year:</strong> 29 years</p>
+            <p><strong>Day:</strong> 10.7 hrs</p>
+            <p>Famous for rings, least dense planet, with moon Titan.</p>
+        ` },
+      uranus:{ 
+        name:"Uranus", 
+        color:"#4fd0e7", 
+        info:`
+            <p><strong>Distance:</strong> 2.87b km</p>
+            <p><strong>Year:</strong> 84 years</p>
+            <p><strong>Day:</strong> 17 hrs</p>
+            <p>Ice giant tilted on its side with 27 moons and faint rings.</p>
+        ` },
+      neptune:{ 
+        name:"Neptune", 
+        color:"#4b70dd", 
+        info:`
+            <p><strong>Distance:</strong> 4.5b km</p>
+            <p><strong>Year:</strong> 165 years</p>
+            <p><strong>Day:</strong> 16 hrs</p>
+            <p>Deep blue, windiest planet with supersonic storms and moon Triton.</p>
+        ` }
     };
 
     let currentView='solar-system';
+
+    // 🎬 เริ่มประสบการณ์
     document.getElementById('startBtn').addEventListener('click',startExperience);
+
+    // 🔘 ปุ่มดู Solar System
     document.getElementById('solarSystemBtn').addEventListener('click',()=>showSolarSystem());
+
+    // ❌ ปิดรายละเอียดดาว
     document.getElementById('closeBtn').addEventListener('click',closePlanetDetail);
 
+    // 📌 ปุ่มเลือกดาวจากด้านข้าง
     Object.keys(planetData).forEach(p=>{
       const btn=document.getElementById(`${p}Btn`);
       if(btn) btn.addEventListener('click',()=>showPlanet(p));
     });
-    document.querySelectorAll('.planet,.sun').forEach(el=>{
-      el.addEventListener('click',e=>{
-        showPlanet(e.target.getAttribute('data-planet'));
-      });
+
+    document.querySelectorAll(".planet,.sun").forEach(el=>{
+        el.addEventListener("click", e => {
+            showPlanet(e.currentTarget.getAttribute("data-planet"));
+        });
     });
 
+    /* 🌠 ฟังก์ชันสร้าง Meteor */
+    function createMeteor(){
+      const meteor=document.createElement('div');
+      meteor.className='meteor';
+      
+      // สุ่มตำแหน่งเริ่มต้น
+      const startX=Math.random()*window.innerWidth;
+      const startY=-100; // เริ่มจากด้านบนของหน้าจอ
+      
+      meteor.style.left=startX+'px';
+      meteor.style.top=startY+'px';
+      
+      document.querySelector('.container').appendChild(meteor);
+      
+      // ลบ meteor หลังจากแอนิเมชันเสร็จ
+      setTimeout(()=>{
+        if(meteor.parentNode) meteor.parentNode.removeChild(meteor);
+      },2000);
+    }
+
+    /* 🌌 เริ่ม Meteor แบบสุ่ม */
+    function startMeteorShower(){
+      setInterval(()=>{
+        if(Math.random()<0.3){ // 30% โอกาสในการสร้าง meteor ทุกครั้ง
+          createMeteor();
+        }
+      },1500); // ตรวจสอบทุก 1.5 วินาที
+    }
+
+    /* 🌌 ฟังก์ชันเริ่มต้น (Big Bang Animation) */
     function startExperience(){
       const startBtn=document.getElementById('startBtn');
       const stars=document.querySelector('.stars');
@@ -259,7 +377,8 @@
       const introText=document.getElementById('introText');
       startBtn.style.display='none';
 
-      createEnergyParticles();
+      createEnergyParticles(); // สร้างอนุภาคพลังงาน
+
       setTimeout(()=>{ blackHole.style.display='block'; },2000);
       setTimeout(()=>{
         blackHole.style.display='none';
@@ -277,8 +396,11 @@
         stars.style.opacity='0.8';
         document.getElementById('mainContent').classList.add('active');
         showSolarSystem();
+        startMeteorShower(); // เริ่ม meteor shower
       },9000);
     }
+
+    /* 🌟 ฟังก์ชันสร้างอนุภาคพลังงาน */
     function createEnergyParticles(){
       const container=document.querySelector('.container');
       for(let i=0;i<50;i++){
@@ -297,11 +419,15 @@
         setTimeout(()=>p.remove(),6000);
       }
     }
+
+    /* 🌞 แสดงมุมมองระบบสุริยะ */
     function showSolarSystem(){
       currentView='solar-system';
       document.getElementById('solarSystemView').style.display='flex';
       document.getElementById('planetDetail').classList.remove('active');
     }
+
+    /* 🪐 แสดงรายละเอียดดาว */
     function showPlanet(key){
       currentView=key;
       const d=planetData[key];
@@ -312,6 +438,8 @@
       document.getElementById('planetInfo').innerHTML=d.info;
       detail.classList.add('active');
     }
+
+    /* ❌ ปิดรายละเอียดดาว */
     function closePlanetDetail(){
       if(currentView!=='solar-system'){ showSolarSystem(); }
     }
