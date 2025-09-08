@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Solar System Explorer - Fixed</title>
+  <title>Solar System Explorer - Continuous Animation</title>
   <style>
     * { margin:0; padding:0; box-sizing:border-box; }
     body {
@@ -131,12 +131,26 @@
     }
     .nav-btn:hover { background:rgba(0,150,255,0.9); transform:translateX(5px); }
 
-    /* 🌞 ระบบสุริยะ */
-    .solar-system { width:100%; height:100%; position:relative;
-      display:flex; align-items:center; justify-content:center; }
+    /* 🌞 ระบบสุริยะ - Always visible as background layer */
+    .solar-system { 
+      width:100%; height:100%; position:absolute; top:0; left:0;
+      display:flex; align-items:center; justify-content:center; 
+      z-index:10; /* Behind detail panel but always running */
+      opacity:1;
+      transition:opacity 0.5s ease;
+    }
+    
+    /* When showing planet detail, dim but don't hide solar system */
+    .solar-system.dimmed {
+      opacity:0.3;
+      filter:blur(2px);
+    }
+    
     .orbit {
       position:absolute; border:1px solid rgba(255,255,255,0.1);
-      border-radius:50%; animation:spin linear infinite;
+      border-radius:50%; 
+      /* Animation never stops! */
+      animation:spin linear infinite;
     }
     @keyframes spin { from{transform:rotate(0deg);} to{transform:rotate(360deg);} }
     .sun {
@@ -174,10 +188,11 @@
     .planet-detail {
       position:absolute; top:50%; left:50%;
       transform:translate(-50%,-50%);
-      background:rgba(0,0,0,0.9); padding:40px; border-radius:20px;
+      background:rgba(0,0,0,0.3); padding:40px; border-radius:20px;
       text-align:center; max-width:500px; backdrop-filter:blur(15px);
-      border:2px solid rgba(255,255,255,0.2);
+      border:2px rgba(255,255,255,0.3);
       display:none; z-index:200;
+      box-shadow:0 0 50px rgba(0,0,0,0.8);
     }
     .planet-detail.active { display:block; animation:fadeIn .5s ease-in-out; }
     @keyframes fadeIn { from{opacity:0;transform:translate(-50%,-50%) scale(0.8);}
@@ -190,6 +205,8 @@
     .planet-detail p { line-height:1.6; margin-bottom:15px; font-size:1.1em; }
     .close-btn { position:absolute; top:15px; right:20px; background:none;
       border:none; color:white; font-size:24px; cursor:pointer; }
+    .close-btn:hover { color:#ffeb3b; transform:scale(1.2); }
+
   </style>
 </head>
 <body>
@@ -222,7 +239,7 @@
         <button class="nav-btn" id="neptuneBtn">Neptune</button>
       </div>
 
-      <!-- 🌌 ระบบสุริยะ -->
+      <!-- 🌌 ระบบสุริยะ - Always running in background -->
       <div class="solar-system" id="solarSystemView">
         <div class="sun" data-planet="sun"></div>
         <div class="orbit mercury-orbit"><div class="planet mercury" data-planet="mercury"></div></div>
@@ -234,6 +251,7 @@
         <div class="orbit uranus-orbit"><div class="planet uranus" data-planet="uranus"></div></div>
         <div class="orbit neptune-orbit"><div class="planet neptune" data-planet="neptune"></div></div>
       </div>
+
 
       <!-- 📖 หน้าต่างรายละเอียดดาว -->
       <div class="planet-detail" id="planetDetail">
@@ -248,25 +266,161 @@
   <script>
     /* 📊 ข้อมูลดาวแต่ละดวง */
     const planetData = {
-      sun:{
-        name:"The Sun",
-        color:"#ffeb3b",
-        info:`<p><strong>Type:</strong> G-type Main Sequence Star (Yellow Dwarf)</p>
-            <p><strong>Diameter:</strong> 1.39 million km</p>
-            <p><strong>Surface Temperature:</strong> ~5,500°C</p>
-            <p>The Sun is the heart of our Solar System, containing 99.8% of its mass.
-            Its energy comes from nuclear fusion of hydrogen into helium. 
-            Without the Sun, life on Earth would not exist.</p>`
+      sun: {
+        name: "The Sun",
+        color: "#ffeb3b",
+        info: `
+          <h2>The Sun</h2>
+          <p><strong>Type:</strong> G-type Main Sequence Star (Yellow Dwarf)</p>
+          <p><strong>Mass:</strong> 1.989 × 10³⁰ kg (99.8% of Solar System's mass)</p>
+          <p><strong>Diameter:</strong> 1.39 million km</p>
+          <p><strong>Surface Temperature:</strong> ~5,500 °C</p>
+          <p><strong>Core Temperature:</strong> ~15 million °C</p>
+          <p><strong>Fun Fact:</strong> The Sun converts 600 million tons of hydrogen into helium every second!</p>
+        `
       },
-      mercury:{ name:"Mercury", color:"#8c7853", info:`<p><strong>Distance:</strong> 57.9m km</p><p><strong>Year:</strong> 88 days</p><p><strong>Day:</strong> 59 days</p><p>Smallest planet, extreme temperatures, and water ice in shadowed craters.</p>` },
-      venus:{ name:"Venus", color:"#ffc649", info:`<p><strong>Distance:</strong> 108m km</p><p><strong>Year:</strong> 225 days</p><p><strong>Day:</strong> 243 days</p><p>Similar size to Earth but hottest planet with thick CO₂ atmosphere.</p>` },
-      earth:{ name:"Earth", color:"#6b93d6", info:`<p><strong>Distance:</strong> 149.6m km</p><p><strong>Year:</strong> 365 days</p><p><strong>Day:</strong> 24 hrs</p><p>Only known planet with life, water oceans, and protective atmosphere.</p>` },
-      mars:{ name:"Mars", color:"#c1440e", info:`<p><strong>Distance:</strong> 227.9m km</p><p><strong>Year:</strong> 687 days</p><p><strong>Day:</strong> 24.6 hrs</p><p>Red Planet with largest volcano Olympus Mons and past liquid water.</p>` },
-      jupiter:{ name:"Jupiter", color:"#d8ca9d", info:`<p><strong>Distance:</strong> 778.5m km</p><p><strong>Year:</strong> 12 years</p><p><strong>Day:</strong> 10 hrs</p><p>Largest planet, gas giant with Great Red Spot storm and 95 moons.</p>` },
-      saturn:{ name:"Saturn", color:"#fad5a5", info:`<p><strong>Distance:</strong> 1.43b km</p><p><strong>Year:</strong> 29 years</p><p><strong>Day:</strong> 10.7 hrs</p><p>Famous for rings, least dense planet, with moon Titan.</p>` },
-      uranus:{ name:"Uranus", color:"#4fd0e7", info:`<p><strong>Distance:</strong> 2.87b km</p><p><strong>Year:</strong> 84 years</p><p><strong>Day:</strong> 17 hrs</p><p>Ice giant tilted on its side with 27 moons and faint rings.</p>` },
-      neptune:{ name:"Neptune", color:"#4b70dd", info:`<p><strong>Distance:</strong> 4.5b km</p><p><strong>Year:</strong> 165 years</p><p><strong>Day:</strong> 16 hrs</p><p>Deep blue, windiest planet with supersonic storms and moon Triton.</p>` }
+      mercury: {
+        name: "Mercury",
+        color: "#8c7853",
+        info: `
+          <h2>Mercury</h2>
+          <p><strong>Type:</strong> Terrestrial Planet</p>
+          <p><strong>Distance from Sun:</strong> 57.9 million km</p>
+          <p><strong>Mass:</strong> 3.3 × 10²³ kg</p>
+          <p><strong>Diameter:</strong> 4,879 km</p>
+          <p><strong>Gravity:</strong> 3.7 m/s²</p>
+          <p><strong>Day Length:</strong> 59 Earth days</p>
+          <p><strong>Year Length:</strong> 88 Earth days</p>
+          <p><strong>Moons:</strong> None</p>
+          <p><strong>Surface Temperature:</strong> -180 °C to 430 °C</p>
+          <p><strong>Fun Fact:</strong> Mercury has water ice in permanently shadowed craters at its poles!</p>
+        `
+      },
+      venus: {
+        name: "Venus",
+        color: "#ffc649",
+        info: `
+          <h2>Venus</h2>
+          <p><strong>Type:</strong> Terrestrial Planet</p>
+          <p><strong>Distance from Sun:</strong> 108 million km</p>
+          <p><strong>Mass:</strong> 4.87 × 10²⁴ kg</p>
+          <p><strong>Diameter:</strong> 12,104 km</p>
+          <p><strong>Gravity:</strong> 8.87 m/s²</p>
+          <p><strong>Day Length:</strong> 243 Earth days (retrograde rotation)</p>
+          <p><strong>Year Length:</strong> 225 Earth days</p>
+          <p><strong>Moons:</strong> None</p>
+          <p><strong>Atmosphere:</strong> 96% CO₂, thick sulfuric acid clouds</p>
+          <p><strong>Surface Temperature:</strong> ~465 °C</p>
+          <p><strong>Fun Fact:</strong> Venus is hotter than Mercury, despite being farther from the Sun.</p>
+        `
+      },
+      earth: {
+        name: "Earth",
+        color: "#6b93d6",
+        info: `
+          <h2>Earth</h2>
+          <p><strong>Type:</strong> Terrestrial Planet</p>
+          <p><strong>Distance from Sun:</strong> 149.6 million km</p>
+          <p><strong>Mass:</strong> 5.97 × 10²⁴ kg</p>
+          <p><strong>Diameter:</strong> 12,742 km</p>
+          <p><strong>Gravity:</strong> 9.8 m/s²</p>
+          <p><strong>Day Length:</strong> 24 hours</p>
+          <p><strong>Year Length:</strong> 365 days</p>
+          <p><strong>Moons:</strong> 1 (The Moon)</p>
+          <p><strong>Atmosphere:</strong> 78% Nitrogen, 21% Oxygen</p>
+          <p><strong>Surface Temperature:</strong> -88 °C to 58 °C</p>
+          <p><strong>Fun Fact:</strong> Earth is the only known planet with life and liquid surface water.</p>
+        `
+      },
+      mars: {
+        name: "Mars",
+        color: "#c1440e",
+        info: `
+          <h2>Mars</h2>
+          <p><strong>Type:</strong> Terrestrial Planet</p>
+          <p><strong>Distance from Sun:</strong> 227.9 million km</p>
+          <p><strong>Mass:</strong> 6.42 × 10²³ kg</p>
+          <p><strong>Diameter:</strong> 6,779 km</p>
+          <p><strong>Gravity:</strong> 3.7 m/s²</p>
+          <p><strong>Day Length:</strong> 24.6 hours</p>
+          <p><strong>Year Length:</strong> 687 days</p>
+          <p><strong>Moons:</strong> 2 (Phobos & Deimos)</p>
+          <p><strong>Atmosphere:</strong> 95% CO₂, thin</p>
+          <p><strong>Surface Temperature:</strong> -125 °C to 20 °C</p>
+          <p><strong>Fun Fact:</strong> Mars has the tallest volcano in the Solar System — Olympus Mons (21 km high).</p>
+        `
+      },
+      jupiter: {
+        name: "Jupiter",
+        color: "#d8ca9d",
+        info: `
+          <h2>Jupiter</h2>
+          <p><strong>Type:</strong> Gas Giant</p>
+          <p><strong>Distance from Sun:</strong> 778.5 million km</p>
+          <p><strong>Mass:</strong> 1.90 × 10²⁷ kg</p>
+          <p><strong>Diameter:</strong> 139,820 km</p>
+          <p><strong>Gravity:</strong> 24.8 m/s²</p>
+          <p><strong>Day Length:</strong> 10 hours</p>
+          <p><strong>Year Length:</strong> 12 years</p>
+          <p><strong>Moons:</strong> 95+ (including Io, Europa, Ganymede, Callisto)</p>
+          <p><strong>Atmosphere:</strong> Hydrogen, Helium</p>
+          <p><strong>Surface Temperature:</strong> ~-145 °C (cloud tops)</p>
+          <p><strong>Fun Fact:</strong> Jupiter's Great Red Spot is a storm that's been raging for at least 400 years.</p>
+        `
+      },
+      saturn: {
+        name: "Saturn",
+        color: "#fad5a5",
+        info: `
+          <h2>Saturn</h2>
+          <p><strong>Type:</strong> Gas Giant</p>
+          <p><strong>Distance from Sun:</strong> 1.43 billion km</p>
+          <p><strong>Mass:</strong> 5.68 × 10²⁶ kg</p>
+          <p><strong>Diameter:</strong> 116,460 km</p>
+          <p><strong>Gravity:</strong> 10.4 m/s²</p>
+          <p><strong>Day Length:</strong> 10.7 hours</p>
+          <p><strong>Year Length:</strong> 29 years</p>
+          <p><strong>Moons:</strong> 146 (largest is Titan)</p>
+          <p><strong>Atmosphere:</strong> Hydrogen, Helium</p>
+          <p><strong>Fun Fact:</strong> Saturn is the least dense planet — it could float in water!</p>
+        `
+      },
+      uranus: {
+        name: "Uranus",
+        color: "#4fd0e7",
+        info: `
+          <h2>Uranus</h2>
+          <p><strong>Type:</strong> Ice Giant</p>
+          <p><strong>Distance from Sun:</strong> 2.87 billion km</p>
+          <p><strong>Mass:</strong> 8.68 × 10²⁵ kg</p>
+          <p><strong>Diameter:</strong> 50,724 km</p>
+          <p><strong>Gravity:</strong> 8.7 m/s²</p>
+          <p><strong>Day Length:</strong> 17 hours</p>
+          <p><strong>Year Length:</strong> 84 years</p>
+          <p><strong>Moons:</strong> 27 (including Titania, Oberon, Miranda)</p>
+          <p><strong>Atmosphere:</strong> Hydrogen, Helium, Methane</p>
+          <p><strong>Fun Fact:</strong> Uranus rotates on its side, possibly due to a massive collision in the past.</p>
+        `
+      },
+      neptune: {
+        name: "Neptune",
+        color: "#4b70dd",
+        info: `
+          <h2>Neptune</h2>
+          <p><strong>Type:</strong> Ice Giant</p>
+          <p><strong>Distance from Sun:</strong> 4.5 billion km</p>
+          <p><strong>Mass:</strong> 1.02 × 10²⁶ kg</p>
+          <p><strong>Diameter:</strong> 49,244 km</p>
+          <p><strong>Gravity:</strong> 11.2 m/s²</p>
+          <p><strong>Day Length:</strong> 16 hours</p>
+          <p><strong>Year Length:</strong> 165 years</p>
+          <p><strong>Moons:</strong> 14 (largest is Triton)</p>
+          <p><strong>Atmosphere:</strong> Hydrogen, Helium, Methane</p>
+          <p><strong>Fun Fact:</strong> Neptune has the fastest winds in the Solar System, over 2,000 km/h.</p>
+        `
+      }
     };
+
 
     let currentView='solar-system';
 
@@ -384,20 +538,27 @@
       }
     }
 
-    /* 🌞 แสดงมุมมองระบบสุริยะ */
+    /* 🌞 แสดงมุมมองระบบสุริยะ - Now keeps orbits running */
     function showSolarSystem(){
       currentView='solar-system';
-      document.getElementById('solarSystemView').style.display='flex';
+      // Remove dimming effect and hide detail panel
+      solarSystemView.classList.remove('dimmed');
       document.getElementById('planetDetail').classList.remove('active');
+      // Solar system stays visible and animated
     }
 
-    /* 🪐 แสดงรายละเอียดดาว */
+    /* 🪐 แสดงรายละเอียดดาว - Dim but keep solar system running */
     function showPlanet(key){
       if (!planetData[key]) { console.warn('showPlanet: unknown key', key); return; }
       currentView=key;
       const d=planetData[key];
-      // hide solar system to show detail (you can change behavior if you prefer)
-      document.getElementById('solarSystemView').style.display='none';
+      
+      // Dim the main solar system but keep it running
+      solarSystemView.classList.add('dimmed');
+      
+
+      
+      // Show planet detail panel
       const detail=document.getElementById('planetDetail');
       document.getElementById('planetName').innerText=d.name;
       document.getElementById('planetImage').style.background=d.color;
