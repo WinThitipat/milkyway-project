@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Solar System Explorer</title>
+  <title>Solar System Explorer - Fixed</title>
   <style>
     * { margin:0; padding:0; box-sizing:border-box; }
     body {
@@ -21,7 +21,7 @@
                   radial-gradient(1px 1px at 130px 80px,rgba(255,255,255,0.6),transparent),
                   radial-gradient(2px 2px at 160px 30px,#ddd,transparent);
       background-repeat:repeat; background-size:200px 150px;
-      animation:twinkle 20s linear infinite; /* ทำให้ดาวระยิบระยับ */
+      animation:twinkle 20s linear infinite;
       opacity:0; transition:opacity 2s ease-in-out;
     }
     @keyframes twinkle { 0%,100%{opacity:0.3;} 50%{opacity:1;} }
@@ -66,6 +66,7 @@
       transform:translate(-50%,-50%);
       text-align:center; font-size:3em; color:#ffeb3b;
       opacity:0; display:none;
+      pointer-events: none; /* allow clicks to pass through */
     }
     .intro-text.big-bang-text {
       animation:introAnim 4s ease-in-out;
@@ -81,6 +82,7 @@
       display:none; position:absolute; top:50%; left:50%;
       transform:translate(-50%,-50%);
       border-radius:50%;
+      pointer-events:none; /* pass clicks through */
     }
     .black-hole { width:80px; height:80px; background:black;
       box-shadow:0 0 60px #000; }
@@ -93,11 +95,27 @@
       border-radius:50%; pointer-events:none;
     }
 
+    /* overlays and orbit ring should not block clicks to planets */
+    .stars,
+    .black-hole,
+    .big-bang,
+    .energy-particle,
+    .orbit {
+      pointer-events: none;
+    }
+
+    /* planets and sun must accept pointer events explicitly */
+    .planet, .sun {
+      pointer-events: auto;
+      z-index: 50;
+    }
+    .sun { z-index: 60; }
+
     body.lit { background:radial-gradient(circle at center,#001133,#000); }
     body.lit .stars { opacity:0.8; }
 
     /* 🖥 เนื้อหาหลัก */
-    .content { width:100%; height:100%; display:none; position:relative; }
+    .content { width:100%; height:100%; display:none; position:relative; z-index:20; }
     .content.active { display:block; }
 
     /* 🔘 ปุ่มนำทางเลือกดูดาว */
@@ -124,7 +142,7 @@
     .sun {
       width:60px; height:60px; background:radial-gradient(circle,#ffeb3b,#ff9800);
       border-radius:50%; position:absolute; top:50%; left:50%;
-      transform:translate(-50%,-50%); box-shadow:0 0 40px #ffeb3b; z-index:10; cursor:pointer;
+      transform:translate(-50%,-50%); box-shadow:0 0 40px #ffeb3b; cursor:pointer;
     }
     .planet {
       width:20px; height:20px; border-radius:50%; position:absolute; top:-10px;
@@ -159,7 +177,7 @@
       background:rgba(0,0,0,0.9); padding:40px; border-radius:20px;
       text-align:center; max-width:500px; backdrop-filter:blur(15px);
       border:2px solid rgba(255,255,255,0.2);
-      display:none;
+      display:none; z-index:200;
     }
     .planet-detail.active { display:block; animation:fadeIn .5s ease-in-out; }
     @keyframes fadeIn { from{opacity:0;transform:translate(-50%,-50%) scale(0.8);}
@@ -233,99 +251,45 @@
       sun:{
         name:"The Sun",
         color:"#ffeb3b",
-        info:`
-            <p><strong>Type:</strong> G-type Main Sequence Star (Yellow Dwarf)</p>
+        info:`<p><strong>Type:</strong> G-type Main Sequence Star (Yellow Dwarf)</p>
             <p><strong>Diameter:</strong> 1.39 million km</p>
             <p><strong>Surface Temperature:</strong> ~5,500°C</p>
             <p>The Sun is the heart of our Solar System, containing 99.8% of its mass.
             Its energy comes from nuclear fusion of hydrogen into helium. 
-            Without the Sun, life on Earth would not exist.</p>
-        `
+            Without the Sun, life on Earth would not exist.</p>`
       },
-      mercury:{ 
-        name:"Mercury", 
-        color:"#8c7853", 
-        info:`
-            <p><strong>Distance:</strong> 57.9m km</p>
-            <p><strong>Year:</strong> 88 days</p>
-            <p><strong>Day:</strong> 59 days</p>
-            <p>Smallest planet, extreme temperatures, and water ice in shadowed craters.</p>
-            ` },
-      venus:{ 
-        name:"Venus", 
-        color:"#ffc649", 
-        info:`
-            <p><strong>Distance:</strong> 108m km</p>
-            <p><strong>Year:</strong> 225 days</p>
-            <p><strong>Day:</strong> 243 days</p>
-            <p>Similar size to Earth but hottest planet with thick CO₂ atmosphere.</p>
-            ` },
-      earth:{ 
-        name:"Earth", 
-        color:"#6b93d6", 
-        info:`
-            <p><strong>Distance:</strong> 149.6m km</p>
-            <p><strong>Year:</strong> 365 days</p>
-            <p><strong>Day:</strong> 24 hrs</p>
-            <p>Only known planet with life, water oceans, and protective atmosphere.</p>
-      ` },
-      mars:{ 
-        name:"Mars", 
-        color:"#c1440e", 
-        info:`
-            <p><strong>Distance:</strong> 227.9m km</p>
-            <p><strong>Year:</strong> 687 days</p>
-            <p><strong>Day:</strong> 24.6 hrs</p>
-            <p>Red Planet with largest volcano Olympus Mons and past liquid water.</p>
-        ` },
-      jupiter:{ 
-        name:"Jupiter", 
-        color:"#d8ca9d", 
-        info:`
-            <p><strong>Distance:</strong> 778.5m km</p>
-            <p><strong>Year:</strong> 12 years</p>
-            <p><strong>Day:</strong> 10 hrs</p>
-            <p>Largest planet, gas giant with Great Red Spot storm and 95 moons.</p>
-        ` },
-      saturn:{ 
-        name:"Saturn", 
-        color:"#fad5a5", 
-        info:`
-            <p><strong>Distance:</strong> 1.43b km</p>
-            <p><strong>Year:</strong> 29 years</p>
-            <p><strong>Day:</strong> 10.7 hrs</p>
-            <p>Famous for rings, least dense planet, with moon Titan.</p>
-        ` },
-      uranus:{ 
-        name:"Uranus", 
-        color:"#4fd0e7", 
-        info:`
-            <p><strong>Distance:</strong> 2.87b km</p>
-            <p><strong>Year:</strong> 84 years</p>
-            <p><strong>Day:</strong> 17 hrs</p>
-            <p>Ice giant tilted on its side with 27 moons and faint rings.</p>
-        ` },
-      neptune:{ 
-        name:"Neptune", 
-        color:"#4b70dd", 
-        info:`
-            <p><strong>Distance:</strong> 4.5b km</p>
-            <p><strong>Year:</strong> 165 years</p>
-            <p><strong>Day:</strong> 16 hrs</p>
-            <p>Deep blue, windiest planet with supersonic storms and moon Triton.</p>
-        ` }
+      mercury:{ name:"Mercury", color:"#8c7853", info:`<p><strong>Distance:</strong> 57.9m km</p><p><strong>Year:</strong> 88 days</p><p><strong>Day:</strong> 59 days</p><p>Smallest planet, extreme temperatures, and water ice in shadowed craters.</p>` },
+      venus:{ name:"Venus", color:"#ffc649", info:`<p><strong>Distance:</strong> 108m km</p><p><strong>Year:</strong> 225 days</p><p><strong>Day:</strong> 243 days</p><p>Similar size to Earth but hottest planet with thick CO₂ atmosphere.</p>` },
+      earth:{ name:"Earth", color:"#6b93d6", info:`<p><strong>Distance:</strong> 149.6m km</p><p><strong>Year:</strong> 365 days</p><p><strong>Day:</strong> 24 hrs</p><p>Only known planet with life, water oceans, and protective atmosphere.</p>` },
+      mars:{ name:"Mars", color:"#c1440e", info:`<p><strong>Distance:</strong> 227.9m km</p><p><strong>Year:</strong> 687 days</p><p><strong>Day:</strong> 24.6 hrs</p><p>Red Planet with largest volcano Olympus Mons and past liquid water.</p>` },
+      jupiter:{ name:"Jupiter", color:"#d8ca9d", info:`<p><strong>Distance:</strong> 778.5m km</p><p><strong>Year:</strong> 12 years</p><p><strong>Day:</strong> 10 hrs</p><p>Largest planet, gas giant with Great Red Spot storm and 95 moons.</p>` },
+      saturn:{ name:"Saturn", color:"#fad5a5", info:`<p><strong>Distance:</strong> 1.43b km</p><p><strong>Year:</strong> 29 years</p><p><strong>Day:</strong> 10.7 hrs</p><p>Famous for rings, least dense planet, with moon Titan.</p>` },
+      uranus:{ name:"Uranus", color:"#4fd0e7", info:`<p><strong>Distance:</strong> 2.87b km</p><p><strong>Year:</strong> 84 years</p><p><strong>Day:</strong> 17 hrs</p><p>Ice giant tilted on its side with 27 moons and faint rings.</p>` },
+      neptune:{ name:"Neptune", color:"#4b70dd", info:`<p><strong>Distance:</strong> 4.5b km</p><p><strong>Year:</strong> 165 years</p><p><strong>Day:</strong> 16 hrs</p><p>Deep blue, windiest planet with supersonic storms and moon Triton.</p>` }
     };
 
     let currentView='solar-system';
 
+    // Wait until DOM is ready (script is bottom-of-body but safe)
+    const startBtn = document.getElementById('startBtn');
+    const stars = document.querySelector('.stars');
+    const blackHole = document.getElementById('blackHole');
+    const bigBang = document.getElementById('bigBang');
+    const introText = document.getElementById('introText');
+    const mainContent = document.getElementById('mainContent');
+    const solarSystemView = document.getElementById('solarSystemView');
+
     // 🎬 เริ่มประสบการณ์
-    document.getElementById('startBtn').addEventListener('click',startExperience);
+    startBtn.addEventListener('click', startExperience);
+
+    // hide introText when animation ends (keeps DOM clean)
+    introText.addEventListener('animationend', () => { introText.style.display = 'none'; });
 
     // 🔘 ปุ่มดู Solar System
-    document.getElementById('solarSystemBtn').addEventListener('click',()=>showSolarSystem());
+    document.getElementById('solarSystemBtn').addEventListener('click', ()=>showSolarSystem());
 
     // ❌ ปิดรายละเอียดดาว
-    document.getElementById('closeBtn').addEventListener('click',closePlanetDetail);
+    document.getElementById('closeBtn').addEventListener('click', closePlanetDetail);
 
     // 📌 ปุ่มเลือกดาวจากด้านข้าง
     Object.keys(planetData).forEach(p=>{
@@ -333,50 +297,53 @@
       if(btn) btn.addEventListener('click',()=>showPlanet(p));
     });
 
-    document.querySelectorAll(".planet,.sun").forEach(el=>{
-        el.addEventListener("click", e => {
-            showPlanet(e.currentTarget.getAttribute("data-planet"));
-        });
+    /* 🌠 Delegate clicks on the solar system view */
+    solarSystemView.addEventListener('click', (e) => {
+      // find the closest element that is .planet or .sun (works even if click on child)
+      const el = e.target.closest('.planet, .sun');
+      if (!el) return;
+      const key = el.dataset.planet;
+      console.log('solarSystemView click ->', key, el);
+      if (key && planetData[key]) showPlanet(key);
+    });
+
+    /* Fallback: document-level listener (rarely used) to catch missed events */
+    document.addEventListener('click', (e) => {
+      const el = e.target.closest('.planet, .sun');
+      if (!el) return;
+      const key = el.dataset.planet;
+      // If solarSystemView contains element, avoid double-calling (solarSystem listener handles most)
+      if (solarSystemView.contains(el)) return;
+      console.log('document fallback click ->', key);
+      if (key && planetData[key]) showPlanet(key);
     });
 
     /* 🌠 ฟังก์ชันสร้าง Meteor */
     function createMeteor(){
       const meteor=document.createElement('div');
       meteor.className='meteor';
-      
-      // สุ่มตำแหน่งเริ่มต้น
       const startX=Math.random()*window.innerWidth;
-      const startY=-100; // เริ่มจากด้านบนของหน้าจอ
-      
+      const startY=-100;
       meteor.style.left=startX+'px';
       meteor.style.top=startY+'px';
-      
       document.querySelector('.container').appendChild(meteor);
-      
-      // ลบ meteor หลังจากแอนิเมชันเสร็จ
-      setTimeout(()=>{
-        if(meteor.parentNode) meteor.parentNode.removeChild(meteor);
-      },2000);
+      setTimeout(()=>{ if(meteor.parentNode) meteor.parentNode.removeChild(meteor); },2000);
     }
 
     /* 🌌 เริ่ม Meteor แบบสุ่ม */
+    let meteorInterval;
     function startMeteorShower(){
-      setInterval(()=>{
-        if(Math.random()<0.3){ // 30% โอกาสในการสร้าง meteor ทุกครั้ง
-          createMeteor();
-        }
-      },1500); // ตรวจสอบทุก 1.5 วินาที
+      meteorInterval = setInterval(()=>{
+        if(Math.random()<0.3){ createMeteor(); }
+      },1500);
+    }
+    function stopMeteorShower(){
+      clearInterval(meteorInterval);
     }
 
     /* 🌌 ฟังก์ชันเริ่มต้น (Big Bang Animation) */
     function startExperience(){
-      const startBtn=document.getElementById('startBtn');
-      const stars=document.querySelector('.stars');
-      const blackHole=document.getElementById('blackHole');
-      const bigBang=document.getElementById('bigBang');
-      const introText=document.getElementById('introText');
       startBtn.style.display='none';
-
       createEnergyParticles(); // สร้างอนุภาคพลังงาน
 
       setTimeout(()=>{ blackHole.style.display='block'; },2000);
@@ -394,7 +361,7 @@
       setTimeout(()=>{
         document.body.classList.add('lit');
         stars.style.opacity='0.8';
-        document.getElementById('mainContent').classList.add('active');
+        mainContent.classList.add('active');
         showSolarSystem();
         startMeteorShower(); // เริ่ม meteor shower
       },9000);
@@ -412,10 +379,7 @@
         p.style.left=x+'px'; p.style.top=y+'px';
         p.style.background=['#fff','#ffeb3b','#ff9800','#f44336','#9c27b0','#3f51b5'][Math.floor(Math.random()*6)];
         container.appendChild(p);
-        setTimeout(()=>{
-          p.style.transition='all 3s ease-in';
-          p.style.left=cx+'px'; p.style.top=cy+'px';
-        },i*10);
+        setTimeout(()=>{ p.style.transition='all 3s ease-in'; p.style.left=cx+'px'; p.style.top=cy+'px'; },i*10);
         setTimeout(()=>p.remove(),6000);
       }
     }
@@ -429,20 +393,30 @@
 
     /* 🪐 แสดงรายละเอียดดาว */
     function showPlanet(key){
+      if (!planetData[key]) { console.warn('showPlanet: unknown key', key); return; }
       currentView=key;
       const d=planetData[key];
+      // hide solar system to show detail (you can change behavior if you prefer)
       document.getElementById('solarSystemView').style.display='none';
       const detail=document.getElementById('planetDetail');
       document.getElementById('planetName').innerText=d.name;
       document.getElementById('planetImage').style.background=d.color;
       document.getElementById('planetInfo').innerHTML=d.info;
       detail.classList.add('active');
+      console.log('showPlanet opened for', key);
     }
 
     /* ❌ ปิดรายละเอียดดาว */
     function closePlanetDetail(){
       if(currentView!=='solar-system'){ showSolarSystem(); }
     }
+
+    // Debug helper: print clickable elements at load
+    window.addEventListener('load', () => {
+      const planets = document.querySelectorAll('.planet, .sun');
+      console.log('planets count:', planets.length);
+      planets.forEach(p => console.log('planet element:', p, 'data-planet=', p.dataset.planet));
+    });
   </script>
 </body>
 </html>
