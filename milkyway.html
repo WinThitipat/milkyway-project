@@ -60,6 +60,24 @@
       font-weight:bold; font-size:16px; color:white;
     }
 
+    /* ⏭️ Skip Button */
+    .skip-button {
+      position:absolute; top:30px; right:30px;
+      padding:12px 24px; 
+      background:rgba(255,255,255,0.2);
+      border:2px solid rgba(255,255,255,0.3); 
+      color:white;
+      border-radius:25px; cursor:pointer; font-weight:bold;
+      backdrop-filter:blur(10px);
+      z-index:1001;
+      display:none; /* hidden until animation starts */
+      transition:all 0.3s ease;
+    }
+    .skip-button:hover {
+      background:rgba(255,255,255,0.35);
+      transform:scale(1.05);
+    }
+
     /* 📝 ข้อความ Intro */
     .intro-text {
       position:absolute; top:50%; left:50%;
@@ -188,7 +206,7 @@
     .planet-detail {
       position:absolute; top:50%; left:50%;
       transform:translate(-50%,-50%);
-      background:rgba(0,0,0,0.3); padding:40px; border-radius:20px;
+      background:rgba(0,0,0,0.1); padding:40px; border-radius:20px;
       text-align:center; max-width:500px; backdrop-filter:blur(15px);
       border:2px rgba(255,255,255,0.3);
       display:none; z-index:200;
@@ -216,6 +234,9 @@
 
     <!-- 🔘 ปุ่มเริ่มต้น -->
     <div class="start-button" id="startBtn"></div>
+
+    <!-- ⏭️ Skip Button -->
+  <button class="skip-button" id="skipBtn">Skip</button>
 
     <!-- 📝 ข้อความต้อนรับ -->
     <div class="intro-text" id="introText">Welcome to the Solar System</div>
@@ -432,6 +453,10 @@
     const introText = document.getElementById('introText');
     const mainContent = document.getElementById('mainContent');
     const solarSystemView = document.getElementById('solarSystemView');
+    let animationTimeouts = []; // store timeout IDs
+    const skipBtn = document.getElementById('skipBtn');
+    skipBtn.addEventListener('click', skipToSolarSystem);
+
 
     // 🎬 เริ่มประสบการณ์
     startBtn.addEventListener('click', startExperience);
@@ -498,28 +523,49 @@
     /* 🌌 ฟังก์ชันเริ่มต้น (Big Bang Animation) */
     function startExperience(){
       startBtn.style.display='none';
-      createEnergyParticles(); // สร้างอนุภาคพลังงาน
+      skipBtn.style.display='block';  // show skip button
+      createEnergyParticles();
 
-      setTimeout(()=>{ blackHole.style.display='block'; },2000);
-      setTimeout(()=>{
+      animationTimeouts.push(setTimeout(()=>{ blackHole.style.display='block'; },2000));
+      animationTimeouts.push(setTimeout(()=>{
         blackHole.style.display='none';
         bigBang.style.display='block';
         document.body.style.backgroundColor='#fff';
         setTimeout(()=>{ document.body.style.backgroundColor=''; },200);
-      },4000);
-      setTimeout(()=>{
+      },4000));
+      animationTimeouts.push(setTimeout(()=>{
         bigBang.style.display='none';
         introText.style.display='block';
         introText.classList.add('big-bang-text');
-      },5000);
-      setTimeout(()=>{
-        document.body.classList.add('lit');
-        stars.style.opacity='0.8';
-        mainContent.classList.add('active');
-        showSolarSystem();
-        startMeteorShower(); // เริ่ม meteor shower
-      },9000);
+      },5000));
+      animationTimeouts.push(setTimeout(()=>{
+        finishAnimation();
+      },9000));
     }
+
+    function finishAnimation(){
+    document.body.classList.add('lit');
+    stars.style.opacity='0.8';
+    mainContent.classList.add('active');
+    showSolarSystem();
+    startMeteorShower();
+    skipBtn.style.display='none'; // hide skip button after done
+  }
+
+  function skipToSolarSystem(){
+    // clear all scheduled timeouts
+    animationTimeouts.forEach(t => clearTimeout(t));
+    animationTimeouts = [];
+
+    // hide all transition elements
+    blackHole.style.display='none';
+    bigBang.style.display='none';
+    introText.style.display='none';
+
+    // jump straight to solar system
+    finishAnimation();
+  }
+
 
     /* 🌟 ฟังก์ชันสร้างอนุภาคพลังงาน */
     function createEnergyParticles(){
