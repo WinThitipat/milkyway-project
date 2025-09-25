@@ -298,8 +298,11 @@
         <div class="planet-image" id="planetImage"></div>
         <div id="planetBasic"></div>
 
-        <!-- More button -->
-        <button id="moreBtn" class="more-btn">More</button>
+        <!-- Buttons container -->
+        <div style="display:flex; gap:15px; justify-content:center; align-items:center; margin-top:15px;">
+          <button id="moreBtn" class="more-btn">More</button>
+          <button id="view3dBtn" class="more-btn" style="background:rgba(255,165,0,0.3); border-color:rgba(255,165,0,0.5);">3D View</button>
+        </div>
 
         <!-- Extra info hidden at first -->
         <div id="planetMore" style="display:none;"></div>
@@ -314,6 +317,7 @@
       sun: {
         name: "The Sun",
         color: "#ffeb3b",
+        nasa3d: "https://eyes.nasa.gov/apps/solar-system/#/sun",
         basic: `
           <p><strong>Type:</strong> G-type Main Sequence Star (Yellow Dwarf)</p>
           <p><strong>Mass:</strong> 1.989 × 10³⁰ kg</p>
@@ -330,6 +334,7 @@
       mercury: {
         name: "Mercury",
         color: "#8c7853",
+        nasa3d: "https://eyes.nasa.gov/apps/solar-system/#/mercury",
         basic: `
           <p><strong>Type:</strong> Terrestrial Planet</p>
           <p><strong>Distance from Sun:</strong> 57.9 million km</p>
@@ -347,6 +352,7 @@
       venus: {
         name: "Venus",
         color: "#e5c07b",
+        nasa3d: "https://eyes.nasa.gov/apps/solar-system/#/venus",
         basic: `
           <p><strong>Type:</strong> Terrestrial Planet</p>
           <p><strong>Distance from Sun:</strong> 108.2 million km</p>
@@ -364,6 +370,7 @@
       earth: {
         name: "Earth",
         color: "#4a90e2",
+        nasa3d: "https://eyes.nasa.gov/apps/solar-system/#/earth",
         basic: `
           <p><strong>Type:</strong> Terrestrial Planet</p>
           <p><strong>Distance from Sun:</strong> 149.6 million km</p>
@@ -381,6 +388,7 @@
       mars: {
         name: "Mars",
         color: "#c1440e",
+        nasa3d: "https://eyes.nasa.gov/apps/solar-system/#/mars",
         basic: `
           <p><strong>Type:</strong> Terrestrial Planet</p>
           <p><strong>Distance from Sun:</strong> 227.9 million km</p>
@@ -398,6 +406,7 @@
       jupiter: {
         name: "Jupiter",
         color: "#d1a55a",
+        nasa3d: "https://eyes.nasa.gov/apps/solar-system/#/jupiter",
         basic: `
           <p><strong>Type:</strong> Gas Giant</p>
           <p><strong>Distance from Sun:</strong> 778.5 million km</p>
@@ -415,12 +424,14 @@
       saturn: {
         name: "Saturn",
         color: "#f5e3b3",
+        nasa3d: "https://eyes.nasa.gov/apps/solar-system/#/saturn",
         basic: `
           <p><strong>Type:</strong> Gas Giant</p>
           <p><strong>Distance from Sun:</strong> 1.43 billion km</p>
           <p><strong>Diameter:</strong> 116,460 km</p>
         `,
         more: `
+          
           <p><strong>Day Length:</strong> 10.7 hours</p>
           <p><strong>Year Length:</strong> 29.5 Earth years</p>
           <p><strong>Moons:</strong> 146 (including Titan)</p>
@@ -432,6 +443,7 @@
       uranus: {
         name: "Uranus",
         color: "#7fffd4",
+        nasa3d: "https://eyes.nasa.gov/apps/solar-system/#/uranus",
         basic: `
           <p><strong>Type:</strong> Ice Giant</p>
           <p><strong>Distance from Sun:</strong> 2.87 billion km</p>
@@ -449,6 +461,7 @@
       neptune: {
         name: "Neptune",
         color: "#4169e1",
+        nasa3d: "https://eyes.nasa.gov/apps/solar-system/#/neptune",
         basic: `
           <p><strong>Type:</strong> Ice Giant</p>
           <p><strong>Distance from Sun:</strong> 4.5 billion km</p>
@@ -657,6 +670,16 @@
       } else {
         more.style.display = 'none';
         moreBtn.innerText = 'More';
+      }
+    });
+
+    // เพิ่มส่วนนี้ใหม่ 👇
+    // 🌍 3D View button - redirect to NASA's Eyes on the Solar System
+    const view3dBtn = document.getElementById('view3dBtn');
+    view3dBtn.addEventListener('click', () => {
+      const data = planetData[currentView];
+      if (data && data.nasa3d) {
+        window.open(data.nasa3d, '_blank');
       }
     });
 
